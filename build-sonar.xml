@@ -24,7 +24,7 @@
     <import file="nbbuild/build.xml"/>
 	
 	<property name="result.dir" location="${basedir}/sonar-output" />
-	<property name="result.classes.dir" location="build.ant.classes.dir" />
+	<property name="result.classes.dir" location="${nb.build.dir}/antclasses" />
 	<property name="result.report.dir" location="${result.dir}/site/jacoco" />
 	<property name="result.exec.file" location="${result.dir}/jacoco.exec" />
 	<!-- SonarQube -->
@@ -44,7 +44,7 @@
 		</jacoco:coverage>
 	</target>
 	
-	<target name="report" depends="coverage">
+	<target name="report" depends="build-nozip,localtest">
 		<!-- Step 3: Create coverage report -->
 		<jacoco:report>
 
@@ -78,6 +78,6 @@
 		<sonar:sonar />
 	</target>
 
-	<target name="rebuild" depends="sonar" />
+	<target name="rebuild" depends="report,sonar" />
 
 </project>

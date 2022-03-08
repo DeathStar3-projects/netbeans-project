@@ -19,7 +19,7 @@
     under the License.
 
 -->
-<project name="nbbuild" default="build-nozip" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
+<project name="nbbuild" default="build-nozip" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless" xmlns:jacoco="antlib:org.jacoco.ant">
 
   <fail message="Please build using Ant 1.9.3 or higher.">
     <condition>
@@ -1381,6 +1381,7 @@ It is possible to use -Ddebug.port=3234 -Ddebug.pause=y to start the system in d
                 </copy>
                 <mkdir dir="${nb.build.dir}/test/unit/results"/>
                 <property name="junit.vm.args" value=""/>
+				<jacoco:coverage destfile="${result.exec.file}">
                 <junit showoutput="true" fork="true" tempdir="${nb.build.dir}/test/unit/results" filtertrace="false" includeantruntime="false">
                     <test/>
                     <classpath>
@@ -1399,6 +1400,7 @@ It is possible to use -Ddebug.port=3234 -Ddebug.pause=y to start the system in d
                     <jvmarg value="-ea"/>
                     <jvmarg line="${junit.vm.args}"/>
                 </junit>
+				</jacoco:coverage>
             </sequential>
         </macrodef>
     </target>
