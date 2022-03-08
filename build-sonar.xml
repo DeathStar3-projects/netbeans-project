@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+<project name="main" basedir="nbbuild" default="build-nozip" xmlns:jacoco="antlib:org.jacoco.ant" xmlns:sonar="antlib:org.sonar.ant">
+    <description>NetBeans master build script.</description>
+    <import file="nbbuild/build.xml"/>
+	
+	<property name="result.dir" location="${basedir}/sonar-output" />
+	<property name="result.classes.dir" location="build.ant.classes.dir" />
+	<property name="result.report.dir" location="${result.dir}/site/jacoco" />
+	<property name="result.exec.file" location="${result.dir}/jacoco.exec" />
+	<!-- SonarQube -->
+	<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant-coverage" />
+	<property name="sonar.projectName" value="Example of Ant and JaCoCo Usage" />
+	<property name="sonar.host.url" value="http://localhost:9000" />
+	<property name="sonar.sources" value="src" />
+	<property name="sonar.java.binaries" value="target" />
+	<property name="sonar.coverage.jacoco.xmlReportPaths" value="${result.report.dir}/report.xml" />
+
+	<!-- Step 1: Import JaCoCo Ant tasks -->
+	<taskdef uri="antlib:org.jacoco.ant" classpath="${basedir}/lib-sonar/jacocoant.jar" resource="org/jacoco/ant/antlib.xml"/>
+
+	<target name="coverage">
+		<jacoco:coverage destfile="${result.exec.file}">
+		      <ant dir="${basedir}" target="build-nozip" />
+		</jacoco:coverage>
+	</target>
+	
+	<target name="report" depends="coverage">
+		<!-- Step 3: Create coverage report -->
+		<jacoco:report>
+
+			<!-- This task needs the collected execution data and ... -->
+			<executiondata>
+				<file file="${result.exec.file}" />
+			</executiondata>
+
+			<!-- the class files and optional source files ... -->
+			<structure name="JaCoCo Ant Example">
+				<classfiles>
+					<fileset dir="${result.classes.dir}" />
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="." />
+				</sourcefiles>
+			</structure>
+
+			<!-- to produce reports in different formats. -->
+			<html destdir="${result.report.dir}" />
+			<csv destfile="${result.report.dir}/report.csv" />
+			<xml destfile="${result.report.dir}/report.xml" />
+		</jacoco:report>
+	</target>
+
+	<!-- ========= Define SonarQube Scanner for Ant Target ========= -->
+	<target name="sonar" depends="build-nozip">
+		<taskdef uri="antlib:org.sonar.ant" classpath="${basedir}/lib-sonar/sonarqube-ant-task-2.7.1.1951.jar" resource="org/sonar/ant/antlib.xml"/>
+		
+		<!-- Execute SonarQube Scanner for Ant Analysis -->
+		<sonar:sonar />
+	</target>
+
+	<target name="rebuild" depends="sonar" />
+
+</project>

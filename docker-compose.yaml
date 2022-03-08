@@ -1,0 +1,9 @@
+version: "3.6"
+
+services:
+  netbeans-builder:
+    image: frekele/ant:1.10.3-jdk8
+    container_name: netbeans-builder
+    command: ant -silent -buildfile /project/build-sonar.xml rebuild -Dcluster.config=standard
+    volumes:
+      - ${PWD}:/project
